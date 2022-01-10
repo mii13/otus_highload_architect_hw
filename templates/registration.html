@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Registration{% endblock %}
+
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+{% block page_content %}
+
+
+<h1 class="cap">Registration</h1>
+{% if er %}
+    <p style="color:red">{{er}}</p>
+{% endif %}
+<form action="/registration" method="post">
+    <p><label for="name">Name: </label><input name="name" type="text" id="name" required /></p>
+    <p><label for="second_name">Second Name: </label><input name="second_name" type="text" id="second_name" required /></p>
+    <p><label for="age">Age: </label><input name="age" type="number" id="age" required /></p>
+    <p> Gender:
+        <label for="male">male: </label><input type="radio" name="gender" id="male" value="m" checked/>
+        <label for="female">female: </label><input type="radio" name="gender" id="female" value="f"/>
+    </p>
+    <p><label for="interests">Interest: </label><input name="interests" type="text" id="interests" required /></p>
+    <p><label for="city">City: </label><input name="city" type="text" id="city" required /></p>
+    <p><label for="email">Email: </label><input name="email" type="email" id="email" required /></p>
+    <p><label for="password">Password: </label><input name="password" type="password" id="password" required /></p>
+    <input type="submit">
+</form>
+
+<p><a href="/login/">login</a></p>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+{% endblock %}

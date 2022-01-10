@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    ports:
+      - "8088:8088"
+    environment:
+      DB_NAME: social_network
+      DB_USER: user 
+      DB_PASSWORD: user_password
+      DB_PORT: 3306
+      DB_HOST: db
+    volumes:
+      - .:/code
+    links:
+      - db
+  db:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: social_network
+      MYSQL_USER: user 
+      MYSQL_PASSWORD: user_password
+    ports:
+      - "3306:3306"
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
