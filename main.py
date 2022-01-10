@@ -81,6 +81,11 @@ async def get_current_user(request: Request):
     return user
 
 
+@app.get('/')
+async def root():
+    return RedirectResponse('/me', status_code=302)
+
+
 @app.get('/me')
 async def me(
     request: Request,
