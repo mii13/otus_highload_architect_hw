@@ -26,3 +26,13 @@ services:
       - "3306:3306"
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
+
+  nginx:
+    restart: always
+    image: nginx:stable-alpine
+    ports:
+      - "0.0.0.0:8000:80"
+    volumes:
+      - "./docker-app/nginx/default:/etc/nginx/conf.d/default.conf:rw"
+    links:
+      - web:web

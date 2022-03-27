@@ -14,13 +14,13 @@
 {% if er %}
 <p style="color:red">{{er}}</p>
 {% endif %}
-<form action="/login" method="post">
+<form action="login" method="post">
     <p><label for="email">Email: </label><input name="email" type="email" id="email" required /></p>
     <p><label for="password">Password: </label><input name="password" type="password" id="password" required /></p>
     <input type="submit">
 </form>
 
-<p><a href="/registration/">registration</a></p>
+<p><a href="registration/">registration</a></p>
 {% endblock %}
 
 {% block scripts %}
