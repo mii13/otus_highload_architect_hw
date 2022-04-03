@@ -17,8 +17,8 @@ sys.path.append(
     os.path.join(path, '..'),
 )
 print(sys.path)
-from src.user.repository import UserRepository
-from src.user.enums import Gender
+from src.apps.user.repository import UserRepository
+from src.apps.user.enums import Gender
 
 
 interests = ['football', 'hockey', 'music', 'reading of books']

@@ -1,17 +1,26 @@
-from pydantic import BaseSettings
+from typing import List
+from pydantic import BaseSettings, BaseModel
 from enum import Enum
 
-__all__ = ['settings']
+__all__ = ('settings',)
+
+
+class DbConnection(BaseModel):
+    host: str
+    port: int
 
 
 class _Settings(BaseSettings):
     # Application Settings
     hash_algorithm: str = "SHA-512"
     pass_salt: str = "nosalt"
-    database_url: str = "sqlite:///./app.db"
-    admin_login: str = "admin"
-    auth_secret_token: str = None
     access_token_expire_minutes: int = 60
+    db_host: str = 'localhost'
+    db_port: int = 3306
+    db_name: str = 'social_network'
+    db_user: str = 'social_network'
+    db_password: str = ''
+    db_replicas: List[DbConnection] = []
 
     class EnvMode(str, Enum):
         prod = "PROD"

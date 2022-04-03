@@ -1,26 +1,41 @@
-import os
 from typing import Text
+from itertools import cycle
 
 import aiomysql
 
-db_host = os.environ['DB_HOST']
-db_port = int(os.environ['DB_PORT'])
-db_name = os.environ['DB_NAME']
-db_user = os.environ['DB_USER']
-db_password = os.environ['DB_PASSWORD']
+from config import settings
 
 
 async def get_connection(loop):
     conn = await aiomysql.connect(
-        host=db_host,
-        port=db_port,
-        user=db_user,
-        password=db_password,
-        db=db_name,
+        host=settings.db_host,
+        port=settings.db_port,
+        user=settings.db_user,
+        password=settings.db_password,
+        db=settings.db_name,
         loop=loop,
         autocommit=True,
     )
     return conn
+
+
+if settings.db_replicas:
+    _next_connection = cycle(settings.db_replicas)
+
+    async def get_replica_connection(loop):
+        connection = next(_next_connection)
+        conn = await aiomysql.connect(
+            host=connection.host,
+            port=connection.port,
+            user=settings.db_user,
+            password=settings.db_password,
+            db=settings.db_name,
+            loop=loop,
+            autocommit=True,
+        )
+        return conn
+else:
+    get_replica_connection = get_connection
 
 
 async def run_sql(connection, sql: Text, args=None):
