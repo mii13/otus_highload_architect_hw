@@ -56,7 +56,7 @@ class UserRepository(BaseRepository):
             order by id
             limit %s, %s 
         """
-        res = await self.run_sql(query, args + [offset, limit])
+        res = await self.run_replica_sql(query, args + [offset, limit])
         if res:
             return [Profile(*row) for row in res]
         return []
