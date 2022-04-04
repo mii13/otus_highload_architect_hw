@@ -40,10 +40,10 @@ class UserRepository(BaseRepository):
         args = []
         if name:
             where.append(' name like %s ')
-            args.append(name )
+            args.append(name + '%')
         if second_name:
             where.append(' second_name like %s ')
-            args.append(second_name )
+            args.append(second_name + '%')
         if where:
             where_str = 'where ' + ' and '.join(where)
         else:
