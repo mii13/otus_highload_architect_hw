@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Registration{% endblock %}
+
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+{% block page_content %}
+{% include 'menu.html' %}
+<div id="content">
+    <h1>Friends</h1>
+    <p>Add new friend</p>
+    <form action="add" method="post">
+        <p><label for="friend">New Friend Id: </label><input name="friend" type="text" id="friend" required /></p>
+        <input type="submit" value="add">
+    </form>
+
+    <p>My friends:</p>
+    <ul>
+        {% for friend in friends %}
+            <li style="margin-bottom: 10px;">{{friend.name}} {{friend.second_name}}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+{% endblock %}

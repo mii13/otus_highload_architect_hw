@@ -60,3 +60,14 @@ class UserRepository(BaseRepository):
         if res:
             return [Profile(*row) for row in res]
         return []
+
+    async def get_user_by_id(self, user_id) -> Optional[User]:
+        query = """
+            select id, email, name, second_name, age, gender, interests, city, password
+            from user 
+            where id = %s
+        """
+        res = await self.run_sql(query, (user_id,))
+        for row in res:
+            return User(*row)
+        return None

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Posts{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block page_content %}
+    {% include 'menu.html' %}
+    <div id="content">
+        <h1>Posts</h1>
+
+        <p>Add new post</p>
+        <form action="/posts/" method="post">
+            <p><input name="text" type="text" id="text" required /></p>
+            <input type="submit" value="add">
+        </form>
+        <p>Post:</p>
+        <ul>
+            {% for post in posts %}
+        <li style="margin-bottom: 20px;">{{post.text}} <span style="font-size: 12px; font-style: italic;">({{post.user_name}} {{post.user_second_name}}, {{post.created_at}})</span></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}

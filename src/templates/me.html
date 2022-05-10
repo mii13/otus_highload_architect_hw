@@ -9,6 +9,9 @@
 
 
 {% block page_content %}
+{% include 'menu.html' %}
+
+<div id="content">
 
 <h1>Profile</h1>
 <form action="auth/logout" method="post">
@@ -20,7 +23,7 @@
 <p>gender: {{user.gender}}</p>
 <p>Interests: {{user.interests}}</p>
 <p>City: {{user.city}}</p>
-
+</div>
 {% endblock %}
 
 {% block scripts %}

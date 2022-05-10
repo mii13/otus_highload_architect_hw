@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Request, status
+from fastapi.staticfiles import StaticFiles
+
 from fastapi.exceptions import RequestValidationError
 from fastapi.encoders import jsonable_encoder
 
@@ -9,20 +11,15 @@ from src.api import router
 
 
 def get_app():
-    print(settings)
     fastapi_params = dict(
         title="social network",
         version="1",
         # on_startup=signals.startup_callbacks,
         # exception_handlers=middleware.exception_handlers,
     )
-    if settings.is_production:
-        # docs is behind password
-        app = FastAPI(**fastapi_params, docs_url=None, redoc_url=None,
-                      openapi_url=None)
-    else:
-        # docs is open
-        app = FastAPI(**fastapi_params, debug=True)
+    app = FastAPI(**fastapi_params, docs_url=None, redoc_url=None,
+                  openapi_url=None)
+    app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request,

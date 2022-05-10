@@ -43,3 +43,10 @@ async def run_sql(connection, sql: Text, args=None):
         async with conn.cursor() as cursor:
             await cursor.execute(sql, args)
             return await cursor.fetchall()
+
+
+async def insert(connection, sql: Text, args=None):
+    async with connection as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(sql, args)
+            return cursor.lastrowid

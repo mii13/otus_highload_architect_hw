@@ -12,11 +12,3 @@ create table IF NOT EXISTS user
     password varchar(255),
     CONSTRAINT id PRIMARY KEY (id)
 );
-
-create table IF NOT EXISTS token
-(
-    id INT NOT NULL AUTO_INCREMENT,
-    token varchar(255) not null,
-    created_at datetime default now() not null,
-    CONSTRAINT id PRIMARY KEY (id)
-);

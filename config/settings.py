@@ -21,21 +21,9 @@ class _Settings(BaseSettings):
     db_user: str = 'social_network'
     db_password: str = ''
     db_replicas: List[DbConnection] = []
-
-    class EnvMode(str, Enum):
-        prod = "PROD"
-        dev = "DEV"
-
-    ENV: EnvMode = EnvMode.prod
-
-    @property
-    def is_production(self):
-        return self.ENV == self.EnvMode.prod
-
-    # Logging Settings
-    @property
-    def logging_level(self):
-        return 'INFO' if self.is_production else 'DEBUG'
+    redis_host: str = 'localhost'
+    redis_port: int = 6379
+    amqp_url: str = 'amqp://guest:guest@localhost/'
 
 
 settings = _Settings()
