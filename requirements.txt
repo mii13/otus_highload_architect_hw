@@ -5,6 +5,7 @@ aiormq==6.2.3
 anyio==3.5.0
 asgiref==3.5.0
 async-timeout==4.0.2
+asynctnt==1.2.3
 Brotli==1.0.9
 certifi==2021.10.8
 cffi==1.15.0
@@ -30,6 +31,7 @@ Jinja2==3.0.3
 locust==2.8.3
 MarkupSafe==2.1.0
 msgpack==1.0.3
+msgpack-python==0.5.6
 multidict==6.0.2
 pamqp==3.1.0
 psutil==5.9.0
@@ -39,12 +41,14 @@ PyJWT==2.3.0
 PyMySQL==0.9.3
 python-dateutil==2.8.2
 python-multipart==0.0.5
+PyYAML==6.0
 pyzmq==22.3.0
 requests==2.27.1
 roundrobin==0.0.2
 six==1.16.0
 sniffio==1.2.0
 starlette==0.16.0
+tarantool==0.6.5
 typing_extensions==4.1.1
 urllib3==1.26.8
 uvicorn==0.16.0

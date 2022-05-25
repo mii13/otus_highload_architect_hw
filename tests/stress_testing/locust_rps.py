@@ -6,5 +6,5 @@ class AnonymousUser(HttpUser):
     def get_profiles(self):
         self.client.get(
             '/profiles',
-            params={"name": "Pat", "second_name": "Pett"},
+            params={"name": "il", "second_name": "mi"},
         )

@@ -2,7 +2,7 @@ from fastapi import Depends, Request, APIRouter
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 
-from src.apps.user.repository import UserRepository
+from src.apps.user.service import UserService
 from src.apps.auth.service import get_current_user
 
 templates = Jinja2Templates(directory='src/templates/')
@@ -17,8 +17,8 @@ async def root():
 
 @router.get('/profiles')
 async def profiles(name: str = '', second_name: str = '', limit: int = 10, offset: int = 0):
-    user_repo = UserRepository()
-    users = await user_repo.search_profiles(name, second_name, limit, offset)
+    service = UserService()
+    users = await service.search_profiles(name, second_name, limit, offset)
     return users
 
 

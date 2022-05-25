@@ -24,6 +24,8 @@ class _Settings(BaseSettings):
     redis_host: str = 'localhost'
     redis_port: int = 6379
     amqp_url: str = 'amqp://guest:guest@localhost/'
+    tarantool_host: str = ''  # if empty not used
+    tarantool_port: int = 3301
 
 
 settings = _Settings()

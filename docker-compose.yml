@@ -14,6 +14,8 @@ services:
       DB_REPLICAS: '[]'
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      TARANTOOL_HOST: tarantool
+      TARANTOOL_PORT: 3302
       amqp_url: 'amqp://guest:guest@rabbit/'
     volumes:
       - .:/code
@@ -23,10 +25,12 @@ services:
       - db
       - redis
       - rabbit
+      - tarantool
     links:
       - db
       - redis
       - rabbit
+      - tarantool
   consumers:
     container_name: posts_consumer
     build: .
@@ -61,6 +65,8 @@ services:
       MYSQL_PASSWORD: user_password
     ports:
       - "3306:3306"
+    volumes:
+      - ./mysql/mysql.cnf:/etc/mysql/conf.d/my.cnf
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
 
@@ -85,3 +91,23 @@ services:
       - "5672:5672"
       - "15672:15672"
       - "5671:5671"
+
+  tarantool:
+    image: tarantool/tarantool:1.10.13
+    ports:
+      - "3301:3301"
+      - "3302:3302"
+    volumes:
+      - ./in_memory_db/tarantool/init.lua:/opt/tarantool/init.lua
+
+  mysql_to_tarantool:
+    restart: always
+    # image: avpgenium/mysql-tarantool-replication:latest
+    build:
+      context: ./in_memory_db/mysql-tarantool-replication
+    depends_on:
+      - tarantool
+      - db
+    links:
+      - tarantool
+      - db

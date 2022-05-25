@@ -1,0 +1,8 @@
+
+CREATE USER 'replica_user'@'%' IDENTIFIED WITH mysql_native_password BY 'replica_pa';
+GRANT REPLICATION SLAVE ON *.* TO 'replica_user'@'%';
+GRANT ALL PRIVILEGES ON social_network.* TO 'replica_user'@'%';
+# если не поможет
+GRANT RELOAD, PROCESS, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'replica_user'@'%';
+
+FLUSH PRIVILEGES;
