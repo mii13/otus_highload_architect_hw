@@ -10,7 +10,6 @@ class FriendshipRepository(BaseRepository):
         values (%s, %s), (%s, %s)
         """
         args = (user1_id, user2_id, user2_id, user1_id)
-        print(args)
         return await self.run_sql(query, args)
 
     async def get_friends(self, user_id) -> List[Profile]:
@@ -19,7 +18,6 @@ class FriendshipRepository(BaseRepository):
             from user inner join friendship on friendship.friend_id = user.id
             where friendship.user_id = %s
         """
-        print(query % user_id)
         rows = await self.run_sql(query, (user_id,))
         return [Profile(*row) for row in rows]
 

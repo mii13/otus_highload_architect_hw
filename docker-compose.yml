@@ -6,6 +6,8 @@ services:
     ports:
       - "8088:8088"
     environment:
+      web_host: 'localhost'
+      web_port: '8088'
       DB_NAME: social_network
       DB_USER: user 
       DB_PASSWORD: user_password
@@ -46,6 +48,7 @@ services:
       amqp_url: 'amqp://guest:guest@rabbit/'
     command:
       - run_consumer
+    restart: always
     volumes:
       - .:/code
     depends_on:
@@ -92,22 +95,22 @@ services:
       - "15672:15672"
       - "5671:5671"
 
-  tarantool:
-    image: tarantool/tarantool:1.10.13
-    ports:
-      - "3301:3301"
-      - "3302:3302"
-    volumes:
-      - ./in_memory_db/tarantool/init.lua:/opt/tarantool/init.lua
-
-  mysql_to_tarantool:
-    restart: always
-    # image: avpgenium/mysql-tarantool-replication:latest
-    build:
-      context: ./in_memory_db/mysql-tarantool-replication
-    depends_on:
-      - tarantool
-      - db
-    links:
-      - tarantool
-      - db
+#   tarantool:
+#     image: tarantool/tarantool:1.10.13
+#     ports:
+#       - "3301:3301"
+#       - "3302:3302"
+#     volumes:
+#       - ./in_memory_db/tarantool/init# .lua:/opt/tarantool/init.lua
+#
+#   mysql_to_tarantool:
+#     restart: always
+#     # image: avpgenium/mysql-tarantool-replication:latest
+#     build:
+#       context: ./in_memory_db/mysql-tarantool-replication
+#     depends_on:
+#       - tarantool
+#       - db
+#     links:
+#       - tarantool
+#       - db

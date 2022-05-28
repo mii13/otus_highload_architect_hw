@@ -5,16 +5,16 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.encoders import jsonable_encoder
 
 from starlette.responses import JSONResponse
-from config import settings
 
 from src.api import router
+from src.api.ws import start_ws_consume
 
 
 def get_app():
     fastapi_params = dict(
         title="social network",
         version="1",
-        # on_startup=signals.startup_callbacks,
+        on_startup=[start_ws_consume, ]
         # exception_handlers=middleware.exception_handlers,
     )
     app = FastAPI(**fastapi_params, docs_url=None, redoc_url=None,

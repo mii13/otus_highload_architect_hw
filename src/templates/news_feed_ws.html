@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Posts{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block page_content %}
+{% include 'menu.html' %}
+<div id="content">
+    <h1>Posts</h1>
+
+    <p>Add new post</p>
+    <form action="" onsubmit="sendMessage(event)">
+        <p><input type="text" id="text" autocomplete="off"/></p>
+        <input type="submit" value="add">
+    </form>
+    <p>Post:</p>
+    <ul id="posts">
+        {% for post in posts %}
+        <li style="margin-bottom: 20px;">{{post.text}} <span style="font-size: 12px; font-style: italic;">({{post.user_name}} {{post.user_second_name}}, {{post.created_at}})</span></li>
+        {% endfor %}
+    </ul>
+</div>
+<script>
+    var ws = new WebSocket("ws://{{host}}:{{port}}/news_feed/ws/{{user_id}}");
+    ws.onmessage = function(event) {
+        var posts = document.getElementById('posts')
+        var post = document.createElement('li')
+        post.style.marginBottom = "20px";
+        var content = document.createTextNode(event.data)
+        post.appendChild(content)
+        posts.prepend(post)
+    };
+    function sendMessage(event) {
+        var input = document.getElementById("text")
+        ws.send(input.value)
+        input.value = ''
+        event.preventDefault()
+    }
+</script>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}

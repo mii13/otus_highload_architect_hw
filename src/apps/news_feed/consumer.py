@@ -4,7 +4,6 @@ from aio_pika import ExchangeType, connect
 from aio_pika.abc import AbstractIncomingMessage
 from config import settings
 from src.apps.news_feed.service import NewsFeedService
-from src.apps.post.containers import deserialize_post
 from src.apps.post.service import PostService
 from src.apps.friendship.service import FriendshipService
 

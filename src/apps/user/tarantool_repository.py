@@ -26,7 +26,6 @@ async def search_profiles(
 
     # client.close()
     result = []
-    print(res)
     for rows in res:
         # for row in rows:
         #     row = row[:-1]

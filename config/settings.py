@@ -12,6 +12,8 @@ class DbConnection(BaseModel):
 
 class _Settings(BaseSettings):
     # Application Settings
+    web_host: str = "localhost"
+    web_port: int = 8088
     hash_algorithm: str = "SHA-512"
     pass_salt: str = "nosalt"
     access_token_expire_minutes: int = 60
