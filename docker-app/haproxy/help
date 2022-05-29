@@ -1,0 +1,5 @@
+CREATE USER 'haproxy_user'@'%';
+
+CREATE USER 'haproxy_root'@'%' IDENTIFIED WITH mysql_native_password BY 'haproxy_root_password';
+GRANT ALL PRIVILEGES ON social_network.* TO 'haproxy_root'@'%';
+FLUSH PRIVILEGES;

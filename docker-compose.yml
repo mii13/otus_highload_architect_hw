@@ -3,22 +3,9 @@ version: "3.9"
 services:
   web:
     build: .
-    ports:
-      - "8088:8088"
-    environment:
-      web_host: 'localhost'
-      web_port: '8088'
-      DB_NAME: social_network
-      DB_USER: user 
-      DB_PASSWORD: user_password
-      DB_PORT: 3306
-      DB_HOST: db
-      DB_REPLICAS: '[]'
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      TARANTOOL_HOST: tarantool
-      TARANTOOL_PORT: 3302
-      amqp_url: 'amqp://guest:guest@rabbit/'
+    env_file:
+      - ./docker-app/env
+    restart: unless-stopped
     volumes:
       - .:/code
     command:
@@ -27,28 +14,45 @@ services:
       - db
       - redis
       - rabbit
-      - tarantool
+      - haproxy
     links:
       - db
       - redis
       - rabbit
-      - tarantool
+      - db-slave-1
+      - db-slave-2
+      - haproxy
+
+  web-2:
+    build: .
+    env_file:
+      - ./docker-app/env
+    restart: unless-stopped
+    volumes:
+      - .:/code
+    command:
+      - run_web
+    depends_on:
+      - db
+      - redis
+      - rabbit
+      - haproxy
+    links:
+      - db
+      - redis
+      - rabbit
+      - db-slave-1
+      - db-slave-2
+      - haproxy
+
   consumers:
     container_name: posts_consumer
     build: .
-    environment:
-      DB_NAME: social_network
-      DB_USER: user
-      DB_PASSWORD: user_password
-      DB_PORT: 3306
-      DB_HOST: db
-      DB_REPLICAS: '[]'
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      amqp_url: 'amqp://guest:guest@rabbit/'
+    env_file:
+      - ./docker-app/env
     command:
       - run_consumer
-    restart: always
+    restart: unless-stopped
     volumes:
       - .:/code
     depends_on:
@@ -61,6 +65,7 @@ services:
       - rabbit
   db:
     image: "mysql:8.0"
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: social_network
@@ -73,22 +78,73 @@ services:
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
 
+  db-slave-1:
+    image: "mysql:8.0"
+    restart: unless-stopped
+    command: ["mysqld", "--server-id=2"]
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: social_network
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    volumes:
+      - ./mysql/mysql_slave.cnf:/etc/mysql/conf.d/my.cnf
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+
+  db-slave-2:
+    image: "mysql:8.0"
+    restart: unless-stopped
+    command: ["mysqld", "--server-id=3"]
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: social_network
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    volumes:
+      - ./mysql/mysql_slave.cnf:/etc/mysql/conf.d/my.cnf
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+
+  haproxy:
+    image: haproxy:2.4
+    user: root
+    hostname: haproxy
+    container_name: haproxy-lb
+    restart: unless-stopped
+    volumes:
+      - "./docker-app/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"
+    ports:
+      - "3307:3306"
+      - "8404:8404"
+    depends_on:
+      - db-slave-2
+      - db-slave-1
+    links:
+      - db-slave-1
+      - db-slave-2
+
   nginx:
-    restart: always
+    restart: unless-stopped
     image: nginx:stable-alpine
     ports:
-      - "0.0.0.0:8000:80"
+      - "0.0.0.0:80:80"
     volumes:
-      - "./docker-app/nginx/default:/etc/nginx/conf.d/default.conf:rw"
+      - "./docker-app/nginx/balancing.conf:/etc/nginx/conf.d/default.conf:rw"
     links:
       - web:web
+    depends_on:
+      - web
+      - web-2
 
   redis:
+    restart: unless-stopped
     image: redis:latest
     ports:
       - "6379:6379"
 
   rabbit:
+    restart: unless-stopped
     image: rabbitmq:3.10.0
     ports:
       - "5672:5672"
@@ -104,7 +160,7 @@ services:
 #       - ./in_memory_db/tarantool/init# .lua:/opt/tarantool/init.lua
 #
 #   mysql_to_tarantool:
-#     restart: always
+#     restart: unless-stopped
 #     # image: avpgenium/mysql-tarantool-replication:latest
 #     build:
 #       context: ./in_memory_db/mysql-tarantool-replication
