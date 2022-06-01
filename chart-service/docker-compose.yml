@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  chat-api:
+    build: .
+    ports:
+      - "8088:8088"
+    environment:
+      DB_HOST: db-shard-1
+      DB_NAME: chat
+      DB_USER: user 
+      DB_PASSWORD: user_password
+      DB_SHARDS: '[{"host":"db-shard-1","port":3306}, {"host":"db-shard-2", "port":3306}]'
+    volumes:
+      - .:/code
+    depends_on:
+      - db-shard-1
+      - db-shard-2
+    links:
+      - db-shard-1
+      - db-shard-2
+  db-shard-1:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: chat
+      MYSQL_USER: user 
+      MYSQL_PASSWORD: user_password
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+  db-shard-2:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: chat
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE

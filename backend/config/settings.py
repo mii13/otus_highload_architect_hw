@@ -28,6 +28,8 @@ class _Settings(BaseSettings):
     amqp_url: str = 'amqp://guest:guest@localhost/'
     tarantool_host: str = ''  # if empty not used
     tarantool_port: int = 3301
+    chart_service_url: str = ''
+    use_opentelemetry: bool = False
 
 
 settings = _Settings()
