@@ -14,6 +14,8 @@ class ChatService:
         success = []
         is_fail = False
         for participant in participants:
+            if message.user_id == participant['user_id']:
+                continue
             try:
                 # todo: add retry
                 await CounterClient(settings.counter_url).increment(
