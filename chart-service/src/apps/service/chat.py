@@ -46,6 +46,7 @@ class ChatService:
 
     async def create_chat(self, chat):
         created_chat = await self.repository.create_chat(chat.name)
+        created_chat['unread'] = 0
         for user in chat.users:
             await self.repository.create_participant(created_chat['id'], user)
         return created_chat
