@@ -9,7 +9,7 @@ class ChatService:
         self.repository = ChatRepository()
 
     async def create_message(self, chat_id, message: Message):
-        message = await self.repository.create_message(chat_id, message)
+        db_message = await self.repository.create_message(chat_id, message)
         participants = await self.repository.get_participants(chat_id)
         success = []
         is_fail = False
@@ -35,7 +35,7 @@ class ChatService:
                     chat_id=message.chat_id,
                     user_id=user_id,
                 )
-            await self.repository.delete_message(message.chat_id, message['message_id'])
+            await self.repository.delete_message(message.chat_id, db_message['message_id'])
         return message
 
     async def get_messages(self, chat_id, from_message_id):
