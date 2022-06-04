@@ -2,7 +2,7 @@ from httpx import AsyncClient
 from urllib.parse import urljoin
 
 
-class SagaError(Exception):
+class CounterTransactionError(Exception):
     """"""
 
 
@@ -22,7 +22,7 @@ class CounterClient:
                 json=dict({'chat_id': chat_id, 'user_id': user_id, 'count': cnt}),
             )
             if response.status_code != 201:
-                raise SagaError()
+                raise CounterTransactionError()
 
             return response.json()
 

@@ -23,6 +23,14 @@ class ChatRepository(BaseRepository):
             "text": message.text,
         }
 
+    async def delete_message(self, chat_id, message_id: int):
+        query = """
+        delete from message 
+        where id = %s
+        """
+        args = (message_id, )
+        await self.do_query_in_shard(chat_id, query, args)
+
     async def get_messages(self, chat_id, from_message_id):
         query = """
             select id, chat_id, user_id, text, created_at
@@ -88,7 +96,7 @@ class ChatRepository(BaseRepository):
             for chat in chats
         ]
 
-    async def create_participant(self, chat_id: str, user: int):
+    async def create_participant(self, chat_id: int, user: int):
         query = """
         insert into participant(chat_id, user_id) 
         values (%s, %s)
@@ -101,7 +109,24 @@ class ChatRepository(BaseRepository):
             'user_id': user,
         }
 
-    async def set_offset(self, chat_id: str, user_id: int, message_id: int):
+    async def get_participants(self, chat_id: int):
+        query = """
+            select user_id, chat_id, last_read_message
+            from participant 
+            where chat_id = %s
+        """
+        args = (chat_id, )
+        rows = await self.do_query(query, args)
+        return [
+            {
+                'user_id': row[0],
+                'chat_id': row[1],
+                'last_read_message': row[2],
+            }
+            for row in rows
+        ]
+
+    async def set_offset(self, chat_id: int, user_id: int, message_id: int):
         query = """
             update participant set last_read_message=%s
             where chat_id=%s
@@ -110,7 +135,7 @@ class ChatRepository(BaseRepository):
         args = (message_id, chat_id, user_id)
         await self.do_query(query, args)
 
-    async def get_offset(self, chat_id: str, user_id: int) -> dict | None:
+    async def get_offset(self, chat_id: int, user_id: int) -> dict | None:
         query = """
             select user_id, chat_id, last_read_message
             from participant 

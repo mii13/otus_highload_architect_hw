@@ -1,6 +1,6 @@
 from src.apps.chat.schema import Message
 from src.apps.repository.chat import ChatRepository
-from src.apps.providers.counter import CounterClient, SagaError
+from src.apps.providers.counter import CounterClient, CounterTransactionError
 from src.settings import settings
 
 
@@ -9,18 +9,31 @@ class ChatService:
         self.repository = ChatRepository()
 
     async def create_message(self, chat_id, message: Message):
-        await CounterClient(settings.counter_url).increment(
-            chat_id=message.chat_id,
-            user_id=message.user_id,
-        )
-        try:
-            message = await self.repository.create_message(chat_id, message)
-        except Exception:
-            # saga rollback
-            await CounterClient(settings.counter_url).decrement(
-                chat_id=message.chat_id,
-                user_id=message.user_id,
-            )
+        message = await self.repository.create_message(chat_id, message)
+        participants = await self.repository.get_participants(chat_id)
+        success = []
+        is_fail = False
+        for participant in participants:
+            try:
+                # todo: add retry
+                await CounterClient(settings.counter_url).increment(
+                    chat_id=message.chat_id,
+                    user_id=participant['user_id'],
+                )
+            except CounterTransactionError:
+                is_fail = True
+                break
+            success.append(participant['user_id'])
+
+        # rollback
+        if is_fail:
+            for user_id in success:
+                # todo: add retry
+                await CounterClient(settings.counter_url).decrement(
+                    chat_id=message.chat_id,
+                    user_id=user_id,
+                )
+            await self.repository.delete_message(message.chat_id, message['message_id'])
         return message
 
     async def get_messages(self, chat_id, from_message_id):
