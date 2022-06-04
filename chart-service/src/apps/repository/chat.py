@@ -75,7 +75,7 @@ class ChatRepository(BaseRepository):
             from message
             where id >= %s
             and chat_id = %s
-            and user_id=%s
+            and user_id != %s
         """
         args = (message_id, chat_id, user_id)
         for row in await self.do_query_in_shard(chat_id, query, args):
