@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, status
 
-from src.services.chat.schema import Message, MessageOut, Chat, ChatOut
+from src.services.chat.schema import Message, MessageOut, Chat, ChatOut, ReadMessage
 from src.services.chat.client import ChatService
 from config import settings
 
@@ -19,6 +19,11 @@ async def create_message(message: Message):
 @message_router.get('/chat/{chat_id}/', response_model=List[MessageOut])
 async def get_messages(chat_id: int, message_id: int = 0):
     return await ChatService(settings.chart_service_url).get_messages(chat_id, message_id)
+
+
+@message_router.post('/read/')
+async def read_message(message: ReadMessage):
+    return await ChatService(settings.chart_service_url).read(message)
 
 
 @chat_router.post('/', response_model=ChatOut)

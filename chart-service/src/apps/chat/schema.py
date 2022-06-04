@@ -3,6 +3,12 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
+class ReadMessage(BaseModel):
+    chat_id: int
+    user_id: int
+    message_id: int
+
+
 class Message(BaseModel):
     chat_id: int
     user_id: int
@@ -26,3 +32,4 @@ class Chat(BaseModel):
 class ChatOut(BaseModel):
     id: int
     name: str
+    unread: int

@@ -1,7 +1,7 @@
 from httpx import AsyncClient
 from opentelemetry.propagate import inject
 import json
-from .schema import Chat, ChatOut, MessageOut, Message
+from .schema import Chat, ReadMessage, Message
 from urllib.parse import urljoin
 
 
@@ -66,6 +66,23 @@ class ChatService:
         async with AsyncClient() as client:
             client: AsyncClient
             endpoint = '/message/'
+
+            url = urljoin(self.url, endpoint)
+
+            response = await client.post(
+                url=url,
+                json=dict(message),
+                headers=headers,
+            )
+
+            return response.json()
+
+    async def read(self, message: ReadMessage):
+        headers = {}
+        inject(headers)
+        async with AsyncClient() as client:
+            client: AsyncClient
+            endpoint = '/message/read/'
 
             url = urljoin(self.url, endpoint)
 

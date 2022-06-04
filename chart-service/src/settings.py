@@ -18,6 +18,7 @@ class _Settings(BaseSettings):
     db_user: str = 'chat'
     db_password: str = ''
     db_shards: List[DbConnection] = []
+    counter_url = 'http://counter_service:8088'
 
 
 settings = _Settings()

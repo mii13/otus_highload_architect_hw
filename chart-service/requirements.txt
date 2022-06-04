@@ -1,10 +1,14 @@
 aiomysql==0.1.0
+httpx==0.23.0
+grpcio==1.46.3
+cffi==1.15.0
+cryptography==36.0.1
 anyio==3.5.0
 asgiref==3.5.0
 click==8.1.2
 crcmod==1.7
-fastapi==0.75.1
-h11==0.13.0
+fastapi==0.78.0
+h11==0.12.0
 httptools==0.4.0
 idna==3.3
 pydantic==1.9.0
@@ -12,13 +16,13 @@ PyMySQL==1.0.2
 python-dotenv==0.20.0
 PyYAML==6.0
 sniffio==1.2.0
-starlette==0.17.1
+starlette==0.19.1
 typing-extensions==4.1.1
 uvicorn==0.17.6
 uvloop==0.16.0
 watchgod==0.8.2
 websockets==10.2
-cryptography
+backoff==1.11.1
 
 opentelemetry-exporter-jaeger==1.11.0
 opentelemetry-exporter-jaeger-proto-grpc==1.11.0

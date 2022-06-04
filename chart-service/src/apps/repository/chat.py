@@ -28,8 +28,13 @@ class ChatRepository(BaseRepository):
             select id, chat_id, user_id, text, created_at
             from message
             where id >= %s
+            and chat_id = %s
         """
-        rows = await self.do_query_in_shard(chat_id, query, (from_message_id,))
+        rows = await self.do_query_in_shard(
+            chat_id,
+            query,
+            (from_message_id, chat_id),
+        )
         return [
             {
                 'message_id': row[0],
@@ -56,6 +61,18 @@ class ChatRepository(BaseRepository):
             'name': name,
         }
 
+    async def message_count(self, chat_id: int, user_id: int, message_id: int):
+        query = """
+            select count(1)
+            from message
+            where id >= %s
+            and chat_id = %s
+            and user_id=%s
+        """
+        args = (message_id, chat_id, user_id)
+        for row in await self.do_query_in_shard(chat_id, query, args):
+            return row[0]
+
     async def get_chats(self, user_id: int):
         query = """
         select chat.id, name from chat inner join participant on chat_id = chat.id
@@ -65,7 +82,7 @@ class ChatRepository(BaseRepository):
         chats = await self.do_query(query, args)
         return [
             {
-                'id': chat[0],
+                'id': int(chat[0]),
                 'name': chat[1],
             }
             for chat in chats
@@ -83,3 +100,27 @@ class ChatRepository(BaseRepository):
             'chat_id': chat_id,
             'user_id': user,
         }
+
+    async def set_offset(self, chat_id: str, user_id: int, message_id: int):
+        query = """
+            update participant set last_read_message=%s
+            where chat_id=%s
+            and user_id=%s 
+        """
+        args = (message_id, chat_id, user_id)
+        await self.do_query(query, args)
+
+    async def get_offset(self, chat_id: str, user_id: int) -> dict | None:
+        query = """
+            select user_id, chat_id, last_read_message
+            from participant 
+            where chat_id=%s
+            and user_id=%s 
+        """
+        args = (chat_id, user_id)
+        for row in self.do_query(query, args):
+            return {
+                'user_id': row[0],
+                'chat_id': row[1],
+                'last_read_message': row[2],
+            }
