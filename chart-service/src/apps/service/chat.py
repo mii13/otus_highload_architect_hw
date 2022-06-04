@@ -36,7 +36,8 @@ class ChatService:
                     user_id=user_id,
                 )
             await self.repository.delete_message(message.chat_id, db_message['message_id'])
-        return message
+            raise Exception()
+        return db_message
 
     async def get_messages(self, chat_id, from_message_id):
         return await self.repository.get_messages(chat_id, from_message_id)
