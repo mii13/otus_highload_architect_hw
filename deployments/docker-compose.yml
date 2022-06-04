@@ -216,9 +216,11 @@ services:
     depends_on:
       - db-shard-1
       - db-shard-2
+      - counter_service
     links:
       - db-shard-1
       - db-shard-2
+      - counter_service
   db-shard-1:
     image: "mysql:8.0"
     networks:
@@ -241,7 +243,38 @@ services:
       MYSQL_PASSWORD: user_password
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
-  #
+  # ============ counter service
+
+  counter_service:
+    build:
+      context: ../counter-service
+    networks:
+      - social_network
+    ports:
+      - "8087:8088"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://counter_service_db/counter?user=username&password=password
+    restart: on-failure
+    command:
+      - runserver
+    # volumes:
+    #   - ../counter-service/:/code
+    depends_on:
+      - counter_service_db
+
+  counter_service_db:
+    image: postgres:14.1-alpine
+    networks:
+      - social_network
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=counter
+      - POSTGRES_PORT=5432
+    ports:
+      - "5432:5432"
+
+  # ============ jaeger
   jaeger-all-in-one:
     image: jaegertracing/all-in-one
     networks:
