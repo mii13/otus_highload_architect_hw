@@ -7,6 +7,21 @@ from starlette.responses import JSONResponse
 from src.api import router
 
 
+def configure_metrics(application: FastAPI):
+    from prometheus_fastapi_instrumentator import Instrumentator
+    # instrumentator = Instrumentator(
+    #     should_group_status_codes=False,
+    #     should_ignore_untemplated=True,
+    #     should_respect_env_var=True,
+    #     should_instrument_requests_inprogress=True,
+    #     excluded_handlers=["/metrics"],
+    #     env_var_name="ENABLE_METRICS",
+    #     inprogress_name="inprogress",
+    #     inprogress_labels=True,
+    # )
+    Instrumentator().instrument(application).expose(application)
+
+
 def create_app():
     application = FastAPI(title='chat', version="1")
 
@@ -20,6 +35,7 @@ def create_app():
         )
 
     application.include_router(router.router)
+    configure_metrics(application)
 
     if 1:
         from opentelemetry import trace

@@ -25,8 +25,8 @@ services:
       - db-slave-1
       - db-slave-2
       - haproxy
-    ports:
-      - "8080:8088"
+    # ports:
+    #   - "8080:8088"
 
   web-2:
     build:
@@ -286,6 +286,108 @@ services:
       - 6831:6831/udp
       - 14268
       - 14250
+
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    networks:
+      - social_network
+    links:
+      - chat-api
+
+  grafana:
+    image: grafana/grafana
+    user: "472"
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./grafana/config.monitoring
+    networks:
+      - social_network
+
+
+## ############# zabbix
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    networks:
+      - social_network
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=password
+
+  zabbix-server:
+    container_name: zabbix-server
+    image: zabbix/zabbix-server-mysql:ubuntu-5.0.1
+    networks:
+      - social_network
+    links:
+      - mysql
+    ports:
+      - '10051:10051'
+    volumes:
+      - './zabbix/alertscripts:/usr/lib/zabbix/alertscripts'
+    environment:
+      - DB_SERVER_HOST=mysql
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=password
+    depends_on:
+      - mysql
+
+  zabbix-frontend:
+    container_name: zabbix-frontend
+    image: zabbix/zabbix-web-apache-mysql:ubuntu-5.0.1
+    networks:
+      - social_network
+    links:
+      - mysql
+    ports:
+      - '8888:8080'
+    environment:
+      - DB_SERVER_HOST=mysql
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=password
+    depends_on:
+      - mysql
+
+  zabbix-agent:
+    container_name: zabbix-agent
+    image: zabbix/zabbix-agent2:alpine-5.0.1
+    user: root
+    depends_on:
+      - zabbix-server
+    networks:
+      - social_network
+    links:
+      - zabbix-server:zabbixserverhost
+    privileged: true
+    volumes:
+      - /var/run:/var/run
+    ports:
+      - '10050:10050'
+    environment:
+      - ZBX_HOSTNAME=zabbix-agent-service
+      - ZBX_SERVER_HOST=zabbixserverhost
+
+      # - ZBX_SERVER_HOST=0.0.0.0/0
+      # - ZBX_SERVER_HOST=172.18.0.1
+
 
 networks:
   social_network:

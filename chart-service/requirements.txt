@@ -38,3 +38,6 @@ opentelemetry-proto==1.11.0
 opentelemetry-sdk==1.11.0
 opentelemetry-semantic-conventions==0.30b0
 opentelemetry-util-http==0.30b0
+
+prometheus-client==0.14.1
+prometheus-fastapi-instrumentator==5.8.1

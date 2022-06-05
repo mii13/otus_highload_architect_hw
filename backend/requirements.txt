@@ -84,3 +84,6 @@ wrapt==1.14.1
 yarl==1.7.2
 zope.event==4.5.0
 zope.interface==5.4.0
+
+prometheus-client==0.14.1
+prometheus-fastapi-instrumentator==5.8.1

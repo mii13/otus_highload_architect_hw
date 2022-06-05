@@ -11,6 +11,21 @@ from src.api.ws import start_ws_consume
 from config import settings
 
 
+def configure_metrics(application: FastAPI):
+    from prometheus_fastapi_instrumentator import Instrumentator
+    instrumentator = Instrumentator(
+        should_group_status_codes=False,
+        should_ignore_untemplated=True,
+        should_respect_env_var=True,
+        should_instrument_requests_inprogress=True,
+        excluded_handlers=["/metrics"],
+        env_var_name="ENABLE_METRICS",
+        inprogress_name="inprogress",
+        inprogress_labels=True,
+    )
+    instrumentator.instrument(application).expose(application)
+
+
 def get_app():
     fastapi_params = dict(
         title="social network",
@@ -32,6 +47,8 @@ def get_app():
         )
 
     app.include_router(router.router)
+
+    # configure_metrics(app)
 
     if settings.use_opentelemetry:
         from opentelemetry import trace
